@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public class ProtocolChatListener extends PacketAdapter {
     public ProtocolChatListener(Main plugin) {
-        super(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT);
+        super(plugin, ListenerPriority.HIGHEST, PacketType.Play.Server.CHAT);
     }
 
     @Override
@@ -48,8 +48,17 @@ public class ProtocolChatListener extends PacketAdapter {
             String text = (String) jsonObject.get("text");
             for(String word : text.split(" ")) {
                 try {
+                    if(plugin.getConfig().getBoolean("forcedMode"))
+                        word = word.replaceAll("[^0-9.]", "");
+                    else if(plugin.getConfig().getBoolean("currencyMode")) {
+                        if(word.startsWith("$") || word.startsWith("£") || word.startsWith("€"))
+                            word = word.substring(1);
+                        else if (word.endsWith("$") || word.endsWith("£") || word.endsWith("€"))
+                            word = word.substring(0, word.length() - 1);
+                    }
+
                     BigDecimal number = BigDecimal.valueOf(Double.valueOf(word));
-                    text = text.replace(word, formatNumber(number));
+                    text = text.replaceFirst(word, formatNumber(number));
                 } catch (NumberFormatException e) {}
             }
             jsonObject.put("text", text);

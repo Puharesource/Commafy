@@ -19,7 +19,7 @@ public class CommandCommafy implements CommandExecutor {
             if(sender.isOp()) {
                 plugin.reloadConfig();
                 sender.sendMessage(ChatColor.GREEN + "You have reloaded the config!");
-            } sender.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+            } else sender.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
             return true;
         }
         return false;
