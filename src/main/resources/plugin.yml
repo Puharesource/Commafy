@@ -1,0 +1,12 @@
+name: Commafy
+version: 1.0.0
+author: Puharesource
+
+depend: [ProtocolLib]
+
+main: io.puharesource.mc.commafy.Main
+
+commands:
+  commafy:
+    description: Reloads the Commafy config!
+    usage: /commafy
