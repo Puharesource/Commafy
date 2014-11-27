@@ -24,7 +24,9 @@ public class ProtocolChatListener extends PacketAdapter {
     public void onPacketSending(PacketEvent event) {
         WrappedChatComponent chat = event.getPacket().getChatComponents().read(0);
         try {
-            chat.setJson(formatJson(chat.getJson()));
+            String text = formatJson(chat.getJson());
+            if (text == null) return;
+            chat.setJson(text);
             event.getPacket().getChatComponents().write(0, chat);
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,20 +40,22 @@ public class ProtocolChatListener extends PacketAdapter {
 
     String formatJson(String jsonString) throws Exception {
         JSONParser parser = new JSONParser();
-        JSONObject json = (JSONObject) parser.parse(jsonString);
+        Object o = parser.parse(jsonString);
+        if (!(o instanceof JSONObject)) return null;
+        JSONObject json = (JSONObject) o;
         JSONArray jsonArray = (JSONArray) json.get("extra");
 
-        for(int i = 0; jsonArray.size() > i; i++) {
-            if(!(jsonArray.get(i) instanceof JSONObject)) continue;
+        for (int i = 0; jsonArray.size() > i; i++) {
+            if (!(jsonArray.get(i) instanceof JSONObject)) continue;
             JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 
             String text = (String) jsonObject.get("text");
-            for(String word : text.split(" ")) {
+            for (String word : text.split(" ")) {
                 try {
-                    if(plugin.getConfig().getBoolean("forcedMode"))
+                    if (plugin.getConfig().getBoolean("forcedMode"))
                         word = word.replaceAll("[^0-9.]", "");
-                    else if(plugin.getConfig().getBoolean("currencyMode")) {
-                        if(word.startsWith("$") || word.startsWith("£") || word.startsWith("€"))
+                    else if (plugin.getConfig().getBoolean("currencyMode")) {
+                        if (word.startsWith("$") || word.startsWith("£") || word.startsWith("€"))
                             word = word.substring(1);
                         else if (word.endsWith("$") || word.endsWith("£") || word.endsWith("€"))
                             word = word.substring(0, word.length() - 1);
@@ -59,7 +63,8 @@ public class ProtocolChatListener extends PacketAdapter {
 
                     BigDecimal number = BigDecimal.valueOf(Double.valueOf(word));
                     text = text.replaceFirst(word, formatNumber(number));
-                } catch (NumberFormatException e) {}
+                } catch (NumberFormatException e) {
+                }
             }
             jsonObject.put("text", text);
             jsonArray.set(i, jsonObject);

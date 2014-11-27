@@ -15,8 +15,8 @@ public class CommandCommafy implements CommandExecutor {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if(cmd.getName().equalsIgnoreCase("commafy")) {
-            if(sender.isOp()) {
+        if (cmd.getName().equalsIgnoreCase("commafy")) {
+            if (sender.isOp()) {
                 plugin.reloadConfig();
                 sender.sendMessage(ChatColor.GREEN + "You have reloaded the config!");
             } else sender.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
